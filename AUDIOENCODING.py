@@ -38,24 +38,27 @@ def binary_to_tones(binary_code):
     LOW_FREQ = 440  # A4 note
     HIGH_FREQ = 880  # A5 note
     
+    # LOW_FREQ = 10000
+    # HIGH_FREQ = 20000
+
     for bit in binary_code:
         if bit == '0':
             play_tone(LOW_FREQ)
         elif bit == '1':
             play_tone(HIGH_FREQ)
-        time.sleep(0.1)  # Short pause between tones
+        time.sleep(.1)  # Short pause between tones
 
 # Main execution
-try:
-    while True:
-        '''Simulate Button Press'''
-        user_input = input("Enter a button call (LOW OXYGEN, SOMETHING'S WRONG, RISE NOW, BOAT): ")
-        if user_input.lower() == 'q':
-            break
-        if user_input not in button_map:
-            print("Please enter a valid Button.")
-            continue
-        freq = button_map[user_input]
-        play_tone(freq)
-finally:
-    p.terminate()
+# try:
+#     while True:
+#         '''Simulate Button Press'''
+#         user_input = input("Enter a button call (LOW OXYGEN, SOMETHING'S WRONG, RISE NOW, BOAT): ")
+#         if user_input.lower() == 'q':
+#             break
+#         if user_input not in button_map:
+#             print("Please enter a valid Button.")
+#             continue
+#         freq = button_map[user_input]
+#         play_tone(freq)
+# finally:
+#     p.terminate()

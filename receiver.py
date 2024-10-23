@@ -3,13 +3,25 @@ import numpy as np
 import matplotlib.pyplot as plt
 import warnings
 import pyttsx3
+from scipy.signal import butter, lfilter
 
 CHUNK = 2**5  # bytes of data per chunk of the audio signal
 RATE = 44100  # sample rate in kHz
-LEN = 5  # length of msg. in seconds. will eventually need to switch to be continuous
+LEN = 10  # length of msg. in seconds. will eventually need to switch to be continuous
+# LOWBAND = 12000
+# HIGHBAND = 24000
+LOWBAND = 440
+HIGHBAND = 880
 
+def butter_bandpass(lowcut, highcut, fs, order=5):
+    return butter(order, [lowcut, highcut], fs=fs, btype='band')
 
-def record_sound(chunk, rate, length):
+def butter_bandpass_filter(data, lowcut, highcut, fs, order=4):
+    b, a = butter_bandpass(lowcut, highcut, fs, order=order)
+    y = lfilter(b, a, data)
+    return y
+
+def record_sound(chunk, rate, length=LEN):
     """
     Records sound data from laptop's internal
     microphone, then saves the recording to a
@@ -52,16 +64,45 @@ def record_sound(chunk, rate, length):
     chunks, samples = np.shape(sound)
     amplitudes = np.reshape(sound, chunks * samples)
     times = np.linspace(0, LEN, chunks * samples, endpoint=True)
+    filtered_amps = butter_bandpass_filter(amplitudes, LOWBAND, HIGHBAND, RATE, order=3)
 
     print("AMPSHAPE: ", np.shape(sound))
     print("TSHAPES: ", np.shape(times))
-    # plt.xlim((0,LEN))
+    plt.xlim((0,LEN))
+    
+    plt.plot(times, amplitudes,label="Raw Data",color="b")
+    plt.plot(times, filtered_amps,label="Filtered Data",color='r')
+    plt.legend(loc="upper left")
+    plt.show()
 
-    # plt.plot(times, amplitudes)
-    # plt.show()
+    return filtered_amps
 
-    return amplitudes
+def on_off_keying(amplitudes,threshold=None):
 
+    times = np.linspace(0, LEN, len(amplitudes), endpoint=True)
+
+    norm_amps = amplitudes / np.max(abs(amplitudes))
+    print("shape of normed amplitudes", np.shape(norm_amps))
+
+    # if threshold is None:
+    #     threshold = np.average(norm_amps)
+    # binary_signal = (norm_amps > threshold).astype(int)
+    # print(30*"-+-")
+    # print("BINARY SIGNAL: ", binary_signal)
+    # print(30*"-+-")
+    num_cyc, n_samples = 10, 440992
+
+    amp_ = np.convolve(norm_amps, np.ones(num_cyc*20)/(num_cyc*20), mode='same')
+
+    thres = 0.01
+    binary_signal = [1 if n >= thres else -1 for n in amp_]
+
+    plt.plot(times, norm_amps,label="Normalized Amplitudes",color='b')
+    plt.plot(times, binary_signal, label="Reconstructed Binary Signal",color='r')
+    plt.legend(loc="upper right")
+    plt.show()
+    str_signal = [str(elem) for elem in binary_signal]
+    return "".join(str_signal)
 
 def fftPlot(sig, dt=None, plot=True):
     """
