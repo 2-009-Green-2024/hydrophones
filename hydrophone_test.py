@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import time
 import pyaudio
+import wave
 
 from AUDIOENCODING import binary_to_tones, play_tone
 from receiver import record_sound, on_off_keying
@@ -33,10 +34,6 @@ for message, encoding in message_map.items():
         print(30*":")
         print(message)
         print(30*":")
-
-
-
-
 
 
 
