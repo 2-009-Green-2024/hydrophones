@@ -151,7 +151,7 @@ def interpret_messages(msg_freq):
     through the computer's microphones
     """
     message_dict = {
-        (200, 299): "LOW OXYGEN",
+        [1, 0, 0, 1]: "LOW OXYGEN",
         (300, 399): "SOMETHING'S WRONG",
         (100, 199): "RISE NOW",
         (500, 599): "BOAT",

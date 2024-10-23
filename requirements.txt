@@ -1,0 +1,4 @@
+time
+pyaudio
+wave
+pyttsx3
